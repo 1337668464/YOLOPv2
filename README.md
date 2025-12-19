@@ -1,4 +1,8 @@
+## 模型下载
+由于文件较大，请从 Release 页面下载权重文件：
+[[下载 yolopv2.pt](https://github.com/1337668464/YOLOPv2/releases/download/v1.0/yolopv2.pt)]
 
+下载后请放入 `data/weights/` 目录。
 <div align="center">
 <h1> YOLOPv2:rocket:: Better, Faster, Stronger for Panoptic driving Perception </h1>
 <!-- <--!span><font size="5", > Efficient and Robust 2D-to-BEV Representation Learning via Geometry-guided Kernel Transformer
