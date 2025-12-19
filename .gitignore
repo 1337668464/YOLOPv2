@@ -1,0 +1,24 @@
+# 忽略所有的环境配置文件夹
+venv/
+env/
+.idea/
+.vscode/
+
+# 忽略 Python 编译文件
+__pycache__/
+*.pyc
+
+# 忽略巨大的模型权重文件 (通常超过100MB GitHub传不上去)
+*.pt
+*.pth
+*.weights
+yolopv2.pt
+data/weights/
+# 忽略数据集文件夹
+data/
+datasets/
+images/
+videos/
+
+# 忽略特定的文件
+secret_api_key.txt

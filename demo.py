@@ -47,7 +47,8 @@ def detect():
 
     # Load model
     stride =32
-    model  = torch.jit.load(weights)
+    #model  = torch.jit.load(weights)
+    model = torch.jit.load(weights, map_location='cpu')
     device = select_device(opt.device)
     half = device.type != 'cpu'  # half precision only supported on CUDA
     model = model.to(device)
