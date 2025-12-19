@@ -156,10 +156,13 @@ We provide two testing method.You can store the image or video.
 ```shell
 python demo.py  --source data/example.jpg
 ```
-## 这里的 0 代表你的默认摄像头（如果有）
-## 或者把 0 换成你的视频路径，例如 data/my_video.mp4
-## 这里提供一个source1里面包含视频
+这里的 0 代表你的默认摄像头（如果有）
+或者把 0 换成你的视频路径，例如 data/my_video.mp4
+这里提供一个source1里面包含视频
+'''
 python demo.py --source 0 --device cpu
+'''
+
 <!-- ## Usage
 coming soon. -->
 
