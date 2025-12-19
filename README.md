@@ -142,6 +142,8 @@ model : trained on the BDD100k dataset and test on T3CAIC camera.
 You can get the model from <a href="https://github.com/CAIC-AD/YOLOPv2/releases/download/V0.0.1/yolopv2.pt">here</a>.
 
 ## 这里不一定你能跑起来因为你可能不是显卡的pytorch
+
+```shell
 ### Load model
 stride =32
 #model  = torch.jit.load(weights)
@@ -150,6 +152,8 @@ device = select_device(opt.device)
 half = device.type != 'cpu'  # half precision only supported on CUDA
 model = model.to(device)
 ### Demo Test
+```
+
 
 We provide two testing method.You can store the image or video.
 
@@ -160,9 +164,9 @@ python demo.py  --source data/example.jpg
 或者把 0 换成你的视频路径，例如 data/my_video.mp4
 这里提供一个source1里面包含视频
 
-'''shell
+```shell
 python demo.py --source 0 --device cpu
-'''
+```
 
 <!-- ## Usage
 coming soon. -->
