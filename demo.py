@@ -18,7 +18,8 @@ def make_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights', nargs='+', type=str, default='data/weights/yolopv2.pt', help='model.pt path(s)')
     parser.add_argument('--source', type=str, default='data/example.jpg', help='source')  # file/folder, 0 for webcam
-    parser.add_argument('--img-size', type=int, default=640, help='inference size (pixels)')
+    parser.add_argument('--img-size', type=int, default=960, help='inference size (pixels)')
+    #这里修改图片尺寸可能会出现后面绘图的时候，无法绘图的情况，但是我已经修改了，适应尺寸机型绘图，
     parser.add_argument('--conf-thres', type=float, default=0.3, help='object confidence threshold')
     parser.add_argument('--iou-thres', type=float, default=0.45, help='IOU threshold for NMS')
     parser.add_argument('--device', default='0', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
@@ -121,9 +122,59 @@ def detect():
 
                     if save_img :  # Add bbox to image
                         plot_one_box(xyxy, im0, line_thickness=3)
-
             # Print time (inference)
             print(f'{s}Done. ({t2 - t1:.3f}s)')
+            # ================== DEBUG 诊断代码 (开始) ==================
+            print("----------------------------------------------------")
+            print(f"[DEBUG] 原图 im0 shape: {im0.shape}")
+
+            # 检查 da_seg_mask 的类型和形状
+            if isinstance(da_seg_mask, torch.Tensor):
+                print(f"[DEBUG] da_seg_mask 是 Tensor, shape: {da_seg_mask.shape}")
+                # 如果是 Tensor，我们需要先把它转成 numpy，否则后面处理会报错
+                da_seg_mask = da_seg_mask.cpu().numpy()
+                ll_seg_mask = ll_seg_mask.cpu().numpy()
+            else:
+                print(f"[DEBUG] da_seg_mask 是 Numpy, shape: {da_seg_mask.shape}")
+
+            # 检查 ll_seg_mask
+            print(f"[DEBUG] ll_seg_mask shape: {ll_seg_mask.shape}")
+            print("----------------------------------------------------")
+            # ================== DEBUG 诊断代码 (结束) ==================
+
+            # ================== 【最终修正版】处理 Batch 维度 + 去黑边 ==================
+            # 1. 关键修复：检查是否存在 Batch 维度 (1, 960, 960)
+            #    如果有 3 个维度，说明第一个是 Batch，取第 0 个出来
+            if da_seg_mask.ndim == 3:
+                da_seg_mask = da_seg_mask[0]
+                ll_seg_mask = ll_seg_mask[0]
+
+            # 2. 现在获取的才是真正的宽高 (例如 960, 960)
+            mh, mw = da_seg_mask.shape[:2]
+            oh, ow = im0.shape[:2]
+
+            # 3. 计算缩放比例 (模仿 Letterbox 的逻辑)
+            #    这里用 min 确保我们是基于最长边缩放的
+            gain = min(mh / oh, mw / ow)
+
+            # 4. 计算有效区域的宽高 (去掉黑边后的尺寸)
+            pad_w = (mw - ow * gain) / 2
+            pad_h = (mh - oh * gain) / 2
+
+            top = int(pad_h)
+            bottom = int(mh - pad_h)
+            left = int(pad_w)
+            right = int(mw - pad_w)
+
+            # 5. 裁剪：切掉模型填充的黑边
+            if top < bottom and left < right:
+                da_seg_mask = da_seg_mask[top:bottom, left:right]
+                ll_seg_mask = ll_seg_mask[top:bottom, left:right]
+
+            # 6. 缩放：拉伸回原图大小
+            da_seg_mask = cv2.resize(da_seg_mask, (ow, oh), interpolation=cv2.INTER_NEAREST)
+            ll_seg_mask = cv2.resize(ll_seg_mask, (ow, oh), interpolation=cv2.INTER_NEAREST)
+            # ======================================================================
             show_seg_result(im0, (da_seg_mask,ll_seg_mask), is_demo=True)
 
             # Save results (image with detections)
