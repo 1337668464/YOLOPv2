@@ -1,4 +1,8 @@
+## 模型下载
+由于文件较大，请从 Release 页面下载权重文件：
+[[下载 yolopv2.pt](https://github.com/1337668464/YOLOPv2/releases/download/v1.0/yolopv2.pt)]
 
+下载后请放入 `data/weights/` 目录。
 <div align="center">
 <h1> YOLOPv2:rocket:: Better, Faster, Stronger for Panoptic driving Perception </h1>
 <!-- <--!span><font size="5", > Efficient and Robust 2D-to-BEV Representation Learning via Geometry-guided Kernel Transformer
@@ -137,13 +141,31 @@ model : trained on the BDD100k dataset and test on T3CAIC camera.
 
 You can get the model from <a href="https://github.com/CAIC-AD/YOLOPv2/releases/download/V0.0.1/yolopv2.pt">here</a>.
 
+## 这里不一定你能跑起来因为你可能不是显卡的pytorch
 
+```shell
+### Load model
+stride =32
+#model  = torch.jit.load(weights)
+model = torch.jit.load(weights, map_location='cpu')
+device = select_device(opt.device)
+half = device.type != 'cpu'  # half precision only supported on CUDA
+model = model.to(device)
 ### Demo Test
+```
+
 
 We provide two testing method.You can store the image or video.
 
 ```shell
 python demo.py  --source data/example.jpg
+```
+这里的 0 代表你的默认摄像头（如果有）
+或者把 0 换成你的视频路径，例如 data/my_video.mp4
+这里提供一个source1里面包含视频
+
+```shell
+python demo.py --source 0 --device cpu
 ```
 
 <!-- ## Usage
